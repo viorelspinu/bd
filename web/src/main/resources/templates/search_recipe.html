@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<head th:replace="fragments/header :: header">
+</head>
+
+
+<body>
+
+
+	<div class='container clearfix pb-5' style='background: #FFF'>
+
+		<div th:replace="fragments/menu :: menu(selected=4)" />
+		<div th:replace="fragments/message_area :: message_area" />
+
+
+		<div style='display: none' class="alert alert-warning" role="alert" id='errorDiv'></div>
+		<div class="container mb-4 clearfix">
+
+			<form id="recipeForm" action="/public/do-search-recipe" method="post" th:object="${searchRecipeForm}"> 
+				<div class='container clearfix'>
+
+					<div class='pl-1 pt-1'>
+					
+						<span id="searchTemplatesNo"> 
+							<span th:each="template : ${searchTemplates}"> 
+								<span th:id="'template_container_' + ${template.id}" class="templateSpan"> 
+									<img sec:authorize="isAuthenticated()" th:id="'del_' + ${template.id}" th:title="'delete ' + ${template.searchText}" 
+									src="/img/del-icon.jpg" style="cursor: pointer" class='deleteTemplateImage' />
+
+									<button
+										style='padding: 0px; padding-left: 0px; margin-right: 10px;' class="searchTemplateBtn btn btn-link btn-sm" th:title="${template.searchText}" th:text="${template.name}">										
+									</button>
+									
+							</span>
+						</span>
+						</span>
+
+						<button class="btn btn-info" type="button" id="saveSearchAsTemplateButton"  th:text="#{save.new.list}"></button>
+
+					</div>
+
+
+					<input th:name="${_csrf.parameterName}" type="hidden"  th:value="${_csrf.token}" />
+					<input th:name="page" type="hidden" th:field="*{page}" /> 
+					<input th:name="pageAdvance" type="hidden" id="pageAdvance" th:field="*{pageAdvance}" />
+					<input th:name="page" type="hidden" id = "sortType" th:field="*{sortType}" /> 
+
+
+					<div class='collapse' id='helpDiv'>
+						<div class='card card-block mt-3 mb-3 pt-3 pb-3 pl-3 pr-3' style='background:#EEE'>
+							<ul>
+								<li class='margin-li'>cautarea se face folosind EXACT
+									cuvintele introduse de tine; nu cauta "lactate" sau
+									"branzeturi", este putin probabil ca sa apara intr-o reteta
+									cuvantul "lactate" pe post de ingredient; cauta in schimb o
+									lista de ingrediente oricat de lunga, in genul "lapte, kefir,
+									smantana, iaurt, lapte batut"</li>
+
+								<li class='margin-li'>ca sa iti fie simplu, salveaza-ti
+									propriile liste de ingrediente pentru cautare (cu oricat de
+									multe ingrediente)</li>
+
+								<li class='margin-li'>foloseste un termen de cautare cat
+									mai generic pentru titlul retetei; daca vei cauta "tocana in
+									vas de lut roman la cuptor de caramida", este putin probabil ca
+									vei gasi ceva; cauta doar "tocana", vei gasi mult mai multe
+									retete</li>
+
+							</ul>
+						</div>
+					</div>
+
+					<div class='clearfix  mt-4'>						
+						<label for="ingredientsNo" class="float-left col-form-label" th:text="#{ingredients.you.not..want}"> </label> 
+														
+						<a class="btn btn-link float-right" data-toggle="collapse" href="#helpDiv" aria-expanded="false" aria-controls="helpDiv" id='showHelpButton'>
+							<span th:text="#{see.help}"> </span>
+						</a>
+
+
+					</div>
+					
+					<div style='display:none' class="alert alert-warning" role="alert" id='tooltipSaveList' th:text="#{save.list.tooltip}"></div>
+					<textarea class="form-control submitOnEnter" id="ingredientsNo"
+						name="ingredientsNo" th:inline="text" rows='3'>[[${searchRecipeForm.ingredientsNo}]]</textarea>
+
+				</div>
+
+
+				<div class='container'>
+					<label for="ingredientsNo"  class="mt-4 col-form-label" th:text="#{ingredients.you.want}"> </label>
+					<small>								
+							<div  class='mt-2'>
+								 <input id="yesAll" type="radio" th:field="*{yesIngredientsAllOrJustOne}" th:value="${T(com.vsp.bd.web.controller.form.SearchRecipeForm).ALL}" /> 
+								 <label for="yesAll" th:text="#{must.contain.all}"></label>					  
+							</div>
+							
+							<div class='mt-2 mb-2'>								
+								 <input id="yesOne" type="radio" th:field="*{yesIngredientsAllOrJustOne}" th:value="${T(com.vsp.bd.web.controller.form.SearchRecipeForm).ONE}" />
+								 <label for="yesOne" th:text="#{must.contain.one}"></label>
+							</div>  
+					</small>
+
+					<textarea class="form-control mb-4 submitOnEnter" id="ingredientsYes" name="ingredientsYes" th:inline="text"
+						rows='2'>[[${searchRecipeForm.ingredientsYes}]]</textarea>
+						
+				</div>
+
+
+				<div class='container mb-4'>
+					<label for="ingredientsYes" class="float-left mt-2 col-form-label" th:text="#{words.in.recipe.title}"> 
+					Enter some words that should be in the recipe name (if you want)) </label> 
+					
+					<input class="form-control mb-4 submitOnEnter" id="titleContains" name="titleContains" th:field="*{titleContains}" />
+					
+				</div>
+
+
+		<div class='clearfix'>
+		<a class="btn btn-link" data-toggle="collapse" href="#websiteCollapseDiv" aria-expanded="false" aria-controls="websiteCollapseDiv" id='showWebsitesButton'>
+			<span th:text="#{see.websites}" ></span>
+		</a>
+		</div>
+		
+		<div class='collapse' id='websiteCollapseDiv'>
+				<div class='container mb-4 clearfix'>
+					<div class='clearfix'>
+						<div class='float-left'>
+							 
+						</div>	
+						
+						<div class='float-right'>
+							 	<button type="button" id="selectAllWebsitesButton" class="btn btn-link" th:text="#{select.all.websites}"></button>
+							 	<button type="button" id="deselectAllWebsitesButton" class="ml-4 btn btn-link" th:text="#{deselect.all.websites}"></button>					 
+						</div>					
+					</div>
+					<div class='float-left'>	
+						<span id='websites' class='p-2' style="display: inline-block;width:300px;" th:each="website : ${searchRecipeForm.websites}">
+					    	<input th:id="'check_website_' + ${website.id}" class='websiteCheck' type="checkbox" th:field="*{selectedWebsites}" th:value="${website.id}" />
+					    	<label th:id="'label_check_website_' + ${website.id}" th:text="${website.domain}"></label>
+				  		</span>
+				  	</div>
+			  </div>
+		  </div>
+
+				<button type="button" id="searchButton" class="btn btn-primary btn-lg float-right" th:text="#{search.recipes.button}"></button>
+
+			</form>
+		</div>
+
+		<p id="table_link"></p>
+
+
+
+		<div th:if="${not #lists.isEmpty(searchRecipeForm.searchExplain)}" class='container mt-5'>
+			<div class="card card-block p-3" style='background:#EEE'>
+				<div th:each="reason : ${searchRecipeForm.searchExplain}" class='mt-2 mb-2'>
+					<span th:text="${reason}"></span>
+				</div>
+			</div>
+		</div>
+
+		<div th:if="${not #lists.isEmpty(searchRecipeForm.recipeList)}" class="container mt-5">
+
+			<div class='float-right mb-3'>
+				<div class='input-group'>
+					<button class="page-link" id="prevButton"
+						th:if="${searchRecipeForm.page > 1}" th:text="#{prev.page}"></button>
+					<span class='ml-4 mr-4 pt-1'> <span th:text="#{page}"></span>
+						<span th:text="${page}"></span>
+					</span>
+					<button class='page-link' id="nextButton"
+						th:if="${searchRecipeForm.shouldDisplayNextButton == 1}"
+						th:text="#{next.page}"></button>
+
+				</div>
+			</div>
+
+			
+			<div class='mb-3 float-left'>
+
+				<ul class="nav">
+				  <li class="nav-item">
+				    <a class="nav-link disabled" href="#">Sorteaza dupa:</a>
+				  </li>
+				  <li class="nav-item">
+				    <a class="nav-link"  th:classappend="${searchRecipeForm.sortType==1} ? sort_active : none" id="sortOnName" href="#">denumire</a>
+				  </li>
+				  <li class="nav-item">
+				    <a class="nav-link" th:classappend="${searchRecipeForm.sortType==4} ? sort_active : none" id="sortOnBlog" href="#">site sursa</a>
+				  </li>
+				  <li class="nav-item">
+				    <a class="nav-link" th:classappend="${searchRecipeForm.sortType==2} ? sort_active : none" id="sortOnIngredientAsc" href="#">numar de ingrediente (crescator)</a>
+				  </li>
+				  <li class="nav-item">
+				    <a class="nav-link" th:classappend="${searchRecipeForm.sortType==3} ? sort_active : none" id="sortOnIngredientDesc" href="#">numar de ingrediente (descrescator)</a>
+				  </li>			  
+				</ul>
+			</div>
+
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" th:text="#{id.table.header}"></th>
+						<th th:text="#{name.table.header}"></th>
+						<th th:text="#{ingredients.table.header}"></th>
+						<th></th>
+						<th sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')"></th>
+						<th sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')"></th>
+						<th></th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr th:each="recipe : ${searchRecipeForm.recipeList}" th:id="'tr_' + ${recipe.id}">
+						<td sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" th:text="${recipe.id}"></td>
+						<td th:text="${recipe.title}"></td>
+						<td th:text="${recipe.ingredientsAsString}"></td>
+						<td class="align-middle">
+							<span th:text="${recipe.websiteNick}" th:title="${recipe.recipeUrl}" class="align-middle badge badge-info"></span>
+						</td>
+						<td sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class='align-middle'>
+							<a th:href="@{/edit/edit-recipe(recipeId=${recipe.id})}" th:text="#{edit.link}"></a>
+						</td>
+						<td sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class='align-middle'>
+							<a class='deleteLink' th:id="'del_' + ${recipe.id}" href="#" th:text="#{delete.link}"></a>
+						</td>
+						<td class='align-middle'>
+							<a th:href="${recipe.recipeUrl}" target="_blank" th:text="#{view.link}"></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+
+	</div>
+	
+	<script>
+	$(document).ready(function() {
+		$(".deleteLink").click(function(event) {
+			var buttonId = event.currentTarget.id;		
+			var id = buttonId.substring("del_".length, buttonId.length);
+			var url = "/edit/delete-recipe";
+	
+			var posting = $.post(url, {
+				recipeId : id
+			});
+			
+			$("#tr_"+id).remove();
+			
+			posting.done(function(data) {
+				alert(data);
+			});
+			return false;
+		});
+	});
+	</script>
+
+	<script id="searchTemplateList" type="text/x-jsrender">
+  {{for searchTemplates}}
+  	
+<span class="templateSpan" id="template_container_{{:id}}">
+    <img id="del_{{:id}}" title="delete {{:name}}" src="/img/del-icon.jpg" style="cursor:pointer" class='deleteTemplateImage' />
+  	<button style='padding-left:0px' class="searchTemplateBtn btn btn-link btn-sm" title="{{:searchText}}">{{:name}}</button>
+</span>  
+
+   {{/for}}
+</script>
+
+	<script th:if="${not #lists.isEmpty(searchRecipeForm.recipeList)}">
+		$(document).ready(function() {
+			window.location = window.location + "#table_link";
+		});
+	</script>
+
+	<script th:if="${not #lists.isEmpty(searchRecipeForm.searchExplain)}">
+		$(document).ready(function() {
+			window.location = window.location + "#table_link";
+		});
+	</script>
+
+
+	<script sec:authorize="!isAuthenticated()">
+		isAuthenticated = false;
+	</script>
+	<script sec:authorize="isAuthenticated()">
+		isAuthenticated = true;
+	</script>
+
+	<script th:if="${#lists.isEmpty(searchTemplates)}">
+	$(document).ready(function() {
+				
+		$('#ingredientsNo').keydown(function (e) {			
+			if ($('#ingredientsNo').val().length == 15) {
+				
+				$("#tooltipSaveList").show();
+				window.setTimeout(function(){ $("#tooltipSaveList").hide(); }, 10000);
+			}
+		});
+		
+			
+	});
+	</script>
+
+
+	<script th:inline="javascript">
+	
+		function submitMainForm(){
+			var ingredientsNo = $("#ingredientsNo").val().toLowerCase();
+			var ingredientsYes = $("#ingredientsYes").val().toLowerCase();
+			var ingredients = ingredientsNo + " " + ingredientsYes; 
+			var titleContains = $("#titleContains").val().toLowerCase();
+			
+			var isError = false;
+			
+			if ((ingredients.includes("branzeturi"))||(ingredients.includes("gluten"))||(ingredients.includes("fainoase"))||(ingredients.includes("lactate"))) {
+				showError("Termenii de cautare trebuie sa contina ingrediente concrete, gen 'faina, lapte, orez, paste, pesmet', ingrediente care apar in mod obisnuit in textul unei retete. 'Gluten', 'branzeturi', 'fainoase', 'lactate', sunt termeni prea generici, iti sugerez sa ii inlocuiesti cu o lista de ingrediente concrete ('faina, lapte, orez, paste, pesmet').");
+				isError = true;
+				window.location = window.location + "#top";
+			}
+			
+			if (titleContains.includes(",") || (titleContains.includes("fel principal")) || (titleContains.includes("mic dejun"))) {
+				showError("Cautarea dupa titlul retetei se face in sensul existentei cuvantului introdus de tine in numele retetei. Foloseste un cuvant cat se poate de concret ('supa', 'tocana', 'chec'), un cuvant pe care te astetpti sa il gasesti intr-un nume de reteta. NU folosi un criteriu generic ('fel principal' sau 'ceva usor inainte de pranz'), pentru ca nu vei gasi nimic. Foloseste un cuvant pe care te astepti sa il gasesti intr-un nume de reteta.");				
+				isError = true;
+				$("#titleContains").effect( "highlight" );
+				$("#titleContains").focus();
+				window.location = window.location + "#top";
+			}
+			
+			if (!isError){			
+				var form = $("#recipeForm");			
+				form.submit();
+			}
+		}
+		
+		function showError(message){
+			$("#errorDiv").html(message);
+			$("#errorDiv").css('display', 'block');
+		}
+	
+		$(document).ready(function() {
+			setEventHandlersForTemplateSearchArea();
+			setCheckboxColor();
+															
+			
+			$('#selectAllWebsitesButton').click(function (e) {
+				$('.websiteCheck').prop('checked', true);
+				setCheckboxColor();
+			});
+			
+			$('#deselectAllWebsitesButton').click(function (e) {
+				$('.websiteCheck').prop('checked', false);  
+				setCheckboxColor();
+			});
+			
+			$('.submitOnEnter').keypress(function (e) {
+				  if (e.which == 13) {
+				    submitMainForm();
+				    return false;    
+				  }
+			});
+						
+			$('.websiteCheck').change(function (e) {				
+				setCheckboxColor();
+			});
+						
+
+			$('#nextButton').click(function (e) {
+					$("#pageAdvance").val(1);
+				    $("#recipeForm").submit();
+				    return false;    
+			});
+
+			$('#prevButton').click(function (e) {
+					$("#pageAdvance").val(-1);
+				    $("#recipeForm").submit();
+				    return false;    
+			});
+
+			$("#searchButton").click(function(event) {
+				submitMainForm();
+			});
+			
+			$('#sortOnName').click(function (e) {
+				$("#sortType").val(/*[[${T(com.vsp.bd.web.controller.form.SearchRecipeForm).SORT_ON_TITLE}]]*/);
+			    $("#recipeForm").submit();
+			    return false;    
+			});
+			
+			$('#sortOnIngredientAsc').click(function (e) {
+				$("#sortType").val(/*[[${T(com.vsp.bd.web.controller.form.SearchRecipeForm).SORT_ON_INGREDIENT_COUNT_ASC}]]*/);
+			    $("#recipeForm").submit();
+			    return false;    
+			});		
+	
+			$('#sortOnIngredientDesc').click(function (e) {
+				$("#sortType").val(/*[[${T(com.vsp.bd.web.controller.form.SearchRecipeForm).SORT_ON_INGREDIENT_COUNT_DESC}]]*/);
+			    $("#recipeForm").submit();
+			    return false;    
+			});
+			
+			$('#sortOnBlog').click(function (e) {
+				$("#sortType").val(/*[[${T(com.vsp.bd.web.controller.form.SearchRecipeForm).SORT_ON_BLOG}]]*/);
+			    $("#recipeForm").submit();
+			    return false;    
+			});
+		});
+
+		function setCheckboxColor(){
+			$('.websiteCheck').each(function (e) {				
+				var id = this.id.substring("check_website_".length, this.id.length);
+				if (this.checked){
+					$("#label_check_website_" + id).css("color", "#000");
+				} else {
+					$("#label_check_website_" + id).css("color", "#888");
+				}
+			});
+		}
+		
+		function deleteTemplate(id, name) {
+			bootbox
+					.confirm({
+						title : /*[[#{confirm.deletion}]]*/,
+						closeButton : false,
+						message : /*[[#{do.you.want.to.delete}]]*/ 
+								+ " '"
+								+ name.substring("delete ".length, name.length)
+								+ "' ?",
+						size : "large",
+						animate : false,
+						callback : function(result) {
+							if (result) {
+								var templateId = parseInt(id.substring(
+										"del_".length, id.length));
+								
+								
+								var url = "/delete-search-template";
+
+								var posting = $.post(url, {
+									id : templateId
+								});
+								
+								$("#template_container_" + templateId).remove();
+								
+
+							}
+						}
+					});
+
+		}
+
+		function setEventHandlersForTemplateSearchArea() {
+			$(".deleteTemplateImage").click(function(event) {
+				var id = event.currentTarget.id;
+				var name = event.currentTarget.title;
+				deleteTemplate(id, name);
+			});
+
+			$(".searchTemplateBtn").click(function(event) {
+				
+				event.preventDefault();
+				var newSearchString = event.currentTarget.title;
+				var oldSearchString = $("#ingredientsNo").val();
+				if (oldSearchString.length > 0) {
+					oldSearchString = oldSearchString + ", ";
+				}
+				$("#ingredientsNo").val(oldSearchString + newSearchString);
+				
+			});
+		}
+
+		function reloadSearchTemplates() {
+
+			$.getJSON("/public/get-search-templates", function(data) {
+				var template = $.templates("#searchTemplateList");
+				var html = template.render(data);
+				$("#searchTemplatesNo").html(html);
+
+				setEventHandlersForTemplateSearchArea();
+
+			});
+
+		}
+
+		
+ 
+		$("#ingredientsNo").focus(function() {
+			$("#saveSearchAsTemplateButton").attr("disabled", false);
+			$("#saveSearchAsTemplateButton").html(/*[[#{save.new.list}]]*/);
+		});
+
+		$("#saveSearchAsTemplateButton").click(
+				function(event) {
+
+					if (!isAuthenticated){
+						showError(/*[[#{auth.required.to.save.search.template}]]*/ 
+								+ ' <a href="/login">'
+								+ 
+								/*[[#{login.auth.error}]]*/
+								+
+								'</a> '
+								+
+								/*[[#{or}]]*/
+								+
+								' <a href="/register">'
+								+
+								/*[[#{create.new.account}]]*/
+								+
+								'</a>.');
+						return;
+					}
+					
+					if ($("#ingredientsNo").val().length == 0){
+						showError(/*[[#{enter.ingredients.then.save.list}]]*/);
+						$("#ingredientsNo").effect( "highlight" );
+						$("#ingredientsNo").focus();
+						return;
+					}
+					
+					$("#errorDiv").css('display', 'none');
+					
+					bootbox.prompt({
+						size : "large",
+						title : /*[[#{enter.search.template.name}]]*/,
+						closeButton : false,
+						animate : false,
+						callback : function(result) {
+							if (result == null) {
+								return;
+							}
+							var ingredientsNo = $("#ingredientsNo").val();
+							var url = "/public/save-search-template";
+
+							$("#saveSearchAsTemplateButton").html(/*[[#{saving.template.in.progress}]]*/);
+							$("#saveSearchAsTemplateButton").attr("disabled", true);
+
+							var posting = $.post(url, {
+								searchText : ingredientsNo,
+								templateName : result
+							});
+
+							posting.done(function(data) {
+								$("#saveSearchAsTemplateButton").html(/*[[#{template.saved}]]*/);
+								reloadSearchTemplates();
+
+							});
+						}
+					});
+
+				});
+	</script>
+
+
+</body>
+</html>

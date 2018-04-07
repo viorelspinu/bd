@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header">
+</head>
+
+<body>
+
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+	<div th:replace="fragments/menu :: menu(selected=3)"/>
+	
+	<div th:replace="fragments/message_area :: message_area"/>
+	
+		
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>synonymIds</th>
+					<th></th>
+					<th></th> 					
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="ingredient : ${ingredientList}">
+					<td th:text="${ingredient.id}"></td>
+					<td th:text="${ingredient.name}"></td>
+					
+					<td><input class="form-control" th:id="'text_synonym_' + ${ingredient.id}" th:name="'text_synonym_' + ${ingredient.id}" th:value="${ingredient.synonymIds}" /></td>
+				
+					<td><a th:href="@{/edit/delete-ingredient(ingredientId=${ingredient.id})}">Delete</a></td>
+					<td><a class="saveButton" href="#" th:id="'save_' + ${ingredient.id}" >Save</a></td>
+				</tr>
+
+			</tbody>
+		</table>
+
+
+
+
+
+	<script>
+	$(document).ready(function() {
+		$(".saveButton").click(function(event) {
+			var buttonId = event.currentTarget.id;		
+			var id = buttonId.substring("save_".length, buttonId.length);
+			var value = $("#text_synonym_" + id).val();
+			var url = "/edit/save-ingredient-synonyms";
+			var posting = $.post(url, {
+				ingredientId : id,
+				synonymIds : value
+			});
+
+			posting.done(function(data) {
+				$("#" + buttonId).html("Saved");
+			});
+			return false;
+		});
+	});
+	</script>
+
+</div>
+</body>
+</html>

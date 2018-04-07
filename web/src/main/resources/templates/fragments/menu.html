@@ -1,0 +1,69 @@
+<div th:fragment="menu (selected)">
+
+	<span th:if="${devMode}" class="badge badge-warning">DEV ENV</span>
+	
+	<span sec:authorize="hasRole('ROLE_ADMIN_DEMO')" class="badge badge-warning">DEMO ADMIN MODE, NO DATA IS ACTUALLY SAVED</span>
+
+	<nav role="navigation" class="navbar navbar-light navbar-expand-md mb-5 justify-content-between">
+ 
+	  	<a class="navbar-brand" href="/">
+    		<img src="/img/bucatar-icon.jpg" alt="home"/>
+  		</a>
+ 
+		<ul class="nav navbar-nav mr-auto">
+
+			<li class="nav-item"
+				th:classappend="${selected == 4} ? active : none"><a
+				class="nav-link" th:href="@{/}">Home</a></li>
+
+			<li sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class="nav-item"
+				th:classappend="${selected == 2} ? active : none"><a
+				class="nav-link" th:href="@{/edit/add-recipe}">Add Recipe</a></li>
+
+			<li sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class="nav-item"
+				th:classappend="${selected == 3} ? active : none"><a
+				class="nav-link" th:href="@{/edit/view-ingredient-list}">Ingredients</a></li>
+
+
+			<li sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class="nav-item"
+				th:classappend="${selected == 5} ? active : none"><a
+				class="nav-link" th:href="@{/edit/view-bulk-import-recipe}">Bulk</a></li>
+
+			<li sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class="nav-item"
+				th:classappend="${selected == 8} ? active : none"><a
+				class="nav-link" th:href="@{/edit/view-parser-config}">Parsers</a></li>
+
+			<li sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')" class="nav-item"
+				th:classappend="${selected == 6} ? active : none"><a
+				class="nav-link" th:href="@{/statistics}">Stats</a></li>
+
+			<li class="nav-item"
+				th:classappend="${selected == 9} ? active : none"><a
+				class="nav-link" th:href="@{/view-clasify-recipe}">Tags</a></li>
+
+			<li class="nav-item"
+				th:classappend="${selected == 7} ? active : none"><a
+				class="nav-link" th:href="@{/public/contact}">Contact</a></li>
+
+		</ul>
+		
+		
+		<form id='logoutForm' name="logoutForm" sec:authorize="isAuthenticated()"
+			class="form-inline" action="/logout" method="post">
+			<input th:name="${_csrf.parameterName}" type="hidden"
+				th:value="${_csrf.token}" />
+			<a class='nav-item' style='text-decoration: none;' onclick='javascript: document.logoutForm.submit()' href="#" th:text="#{logout.menu}">logout</a>
+		</form>
+
+
+		<a class='nav-link' sec:authorize="!isAuthenticated()" style='text-decoration: none;' href="/login" th:text="#{login.menu}">login</a>
+
+		<a class='nav-link' sec:authorize="!isAuthenticated()" style='text-decoration: none;' href="/register" th:text="#{register.menu}">register</a>
+
+		<span sec:authorize="isAuthenticated()" style='margin-left:30px;color:#AAA' sec:authentication="name">Bob</span>
+
+
+
+	</nav>
+
+</div>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header">
+</head>
+
+<body>
+
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+	<div th:replace="fragments/menu :: menu(selected=8)"/>
+	
+	<div th:replace="fragments/message_area :: message_area"/>
+	
+	
+	<div class='card pt-4 pr-4 pl-4 pb-4 mb-4 mt-4 clearfix'>
+		<div class="mb-3">
+			Add a new text fragment (will also reload all parsers)
+		</div>
+		<form id="recipeForm" action="/edit/add-new-must-query" method="post">
+	
+				<div class='container clearfix'>
+
+					<input th:name="${_csrf.parameterName}" type="hidden"  th:value="${_csrf.token}" />
+
+					<input type="text" class="form-control" id="newValue" name="newValue" />
+
+				</div>
+				<div>
+					<button type="submit" id="saveButton" class="btn btn-primary btn-lg float-right mt-3 mb-4" th:text="Add"></button>
+				</div>
+			</form>
+	</div>
+		
+		<div class='container  mt-4'>
+			An article must contain at least one of the below fragments to be considered a valid recipe.
+		</div>
+		
+		<div class='container'>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th> 					
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="query : ${mustHaveQueries}">
+					<td th:text="${query.value}"></td>							
+					<td><a th:href="@{/edit/delete-must-query(id=${query.id})}">Delete</a></td>
+					<td></td>					
+				</tr>
+
+			</tbody>
+		</table>
+		</div>
+
+
+
+
+	<script>
+	</script>
+
+</div>
+</body>
+</html>

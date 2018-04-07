@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header">
+</head>
+
+<body>
+
+	<div class='container clearfix pb-5' style='background: #FFF'>
+
+		<div th:replace="fragments/menu :: menu(selected=6)" />
+
+		<div th:replace="fragments/message_area :: message_area" />
+
+		<div class="">
+			<div class='clearfix align-center w-50'>
+
+				<h4 class='pt-4 mb-0'>Statistics</h4>
+
+				<div class='container mt-3'>
+					<span>Recipe count: </span> <span th:text="${totalRecipeCount}"></span>
+				</div>
+				<div class='container mt-3'>
+					<span>Recipes with ingredients outdated: </span> <span
+						th:text="${ingredientsOutdatedCount}"></span>
+
+					<div class='ml-2'>
+						<a class='btn btn-main' th:href="@{/reset-ingredients}">Re-compute ingredients in all recipes</a>
+					</div>
+
+
+				</div>
+				<div class='container mt-3'>
+					<span>Recipes not yet parsed: </span> <span
+						th:text="${recipesNotYetParsed}"></span>
+				
+					<div class='ml-2'>
+						<a class='btn btn-main' th:href="@{/reparse-recipes}">Re-parse all recipes</a>
+					</div>
+				
+				</div>
+				<div class='container mt-3'>
+					<span>Recipes that can't be parsed: </span> 
+					<a target="_blank" href='/view-recipe-list?stage=3'> 
+						<span th:text="${recipesCantBeParsed}"></span>
+					</a>
+					<span class='ml-2'>
+					<a class='btn btn-main' th:href="@{/reset-unparsable}" th:if="${recipesCantBeParsed > 0}">Try again</a>
+					</span>
+				</div>
+				
+
+				<div class='container mt-3'>
+					<span>User accounts : </span> <span th:text="${userCount}"></span>
+				</div>
+				
+				<div class='container mt-3 mb-3'>
+					<span>Search Templates : </span> <span th:text="${searchTemplateCount}"></span>
+				</div>
+
+			</div>
+		</div>
+
+		<div th:if="${not #lists.isEmpty(errors)}" class='mt-4 mb-4' >
+				<a class='btn btn-main' th:href="@{/delete-all-error-log}">Delete all errors</a>
+		</div>
+
+		<div th:each="log : ${errors}" class='mb-5 mt-5'>
+			<div>
+				<a th:href="@{/delete-log(id=${log.id})}">Delete</a>
+			</div>
+			<div th:text="${log.value}"></div>			
+		</div>
+
+		<div class="mb-3 mt-5">
+		Last logins:
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th></th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr th:each="log : ${logins}">
+					<td th:text="${log.value}"></td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+
+
+		<div class="mb-3 mt-5">
+		Last 30 queries:
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th></th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr th:each="log : ${searches}">
+					<td th:text="${log.value}"></td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+
+
+
+	</div>
+
+
+</body>
+</html>

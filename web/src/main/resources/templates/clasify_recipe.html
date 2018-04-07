@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<head th:replace="fragments/header :: header">
+</head>
+
+
+<body>
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+
+
+		<div th:replace="fragments/menu :: menu(selected=9)" />
+		<div th:replace="fragments/message_area :: message_area" />
+
+
+
+
+		<div class="container">
+
+			<div class='m-4'>
+				<div class='p-0' style='border:1px solid #AAA'>
+					<div th:style="'background:green;width:' + ${barWidth} + '%'">
+					&nbsp;
+					</div>
+				</div>
+				
+				<span th:text="${clasifiedCount}"></span>
+				<span> / 20</span>
+			</div>
+
+
+			<h3>
+			Ce fel de reteta este aceasta ?
+			</h3>
+
+				<div class='card mb-5 mt-5'>
+						<h4>
+							<div class='m-4' th:text="${editRecipeForm.title}" ></div>
+						</h4>
+						
+						<div class='m-4'>
+							<a target="_blank" th:href="${editRecipeForm.url}" th:text="${editRecipeForm.url}"></a>
+						</div>
+						<div class='m-4' th:text="${editRecipeForm.ingredients}" ></div>
+
+				</div>
+
+
+
+			<form id="recipeForm" action="/clasify-recipe" method="post">
+			
+				<input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}" />
+				<input type="hidden" name="recipeId" id="recipeId" th:value="${editRecipeForm.id}" />				
+				<input type="hidden" name="tagId" id="tagId" value="" />
+				
+				
+				
+				<div id='thanks_div' style='display:none'>
+					Multumesc, incarc urmatoarea reteta imediat...
+				</div>
+				
+				<div id='buttons_div'>
+				
+					<div class='mb-3'>
+					Apasa unul dintre butoanele de mai jos ca sa indici ce fel de reteta avem in pagina.
+					</div>
+					
+					<span th:each="tag : ${tags}">
+						<button type="button" class="btn btn m-3 mt-3 tagButton" th:id="'button_' + ${tag.id}" th:text="${tag.name}"></button>
+					</span>
+				</div>
+
+
+			</form>
+		</div>
+		
+		
+		<div class="mt-5 mb-5 container" sec:authorize="hasRole('ROLE_ADMIN') OR hasRole('ROLE_ADMIN_DEMO')">
+			
+			<form method="post" action="/edit/batch-clasify">
+				<input th:name="${_csrf.parameterName}" type="hidden"  th:value="${_csrf.token}" />
+				
+				<div class='mb-1 mt-3'>
+				Recipe id list:
+				</div>
+				<textarea class="form-control" id="recipeIdList" name="recipeIdList" rows='3'></textarea>
+				
+				<div class='mb-1 mt-3'>
+				Tag id to add :
+				</div>
+				<input class="form-control mb-4" id="batchTagId" name="batchTagId" ></input>
+				
+				<button class="btn btn-primary" type='submit'>Submit</button>
+								
+			</form>
+		</div>
+	</div>
+
+
+
+	<script>
+				
+		$(".tagButton").click(function(event) {
+
+			var id = event.currentTarget.id;
+			id = id.substring("button_".length, id.length);
+			$("#tagId").val(id);
+			var form = $("#recipeForm");
+			$("#buttons_div").hide();
+			$("#thanks_div").show();
+			form.submit();
+		});
+
+		
+	</script>
+
+
+</body>
+</html>

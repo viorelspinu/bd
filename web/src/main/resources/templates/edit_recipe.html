@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<head th:replace="fragments/header :: header">
+</head>
+
+
+<body>
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+
+
+		<div th:replace="fragments/menu :: menu(selected=2)" />
+		<div th:replace="fragments/message_area :: message_area" />
+
+
+
+		<div class="container">
+
+
+			<form id="recipeForm" action="/edit/save-recipe" method="post" th:object="${editRecipeForm}">
+			
+				<input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}" />
+
+				<section>
+
+					<span id='recipeAlreadyExistsWarningDiv' style='display: none' class="alert alert-warning" role="alert">We already have this recipe, thanks.</span>
+
+					<div class="row mt-3 mb-5 justify-content-end">
+						<div class="col-md-9">
+							<input class="form-control" type="text" id="recipeUrl" placeholder="Recipe URL (optional)" name="recipeUrl" th:field="*{url}" />
+
+						</div>
+
+						<div class="col">
+							<button type="button" id="parseRecipeButton" class="align-self-end btn btn-link">Parse recipe</button>
+						</div>
+					</div>
+
+				</section>
+
+
+
+
+				<input class="form-control mt-3" type="text" id="title" placeholder="Recipe Title" name="recipeTitle" th:field="*{title}" />
+
+				<textarea placeholder="Recipe text (how it's done)" class="form-control mt-3" name="text" rows="6" cols="80" id='text' th:inline="text">[[*{text}]]</textarea>
+
+
+
+				<textarea placeholder="Ingredients (use 'Detect Ingredients' button to populate)"
+					class="form-control mt-3" style='margin-bottom: 40px;' rows="3"
+					cols="80" id='ingredients' name="ingredients" th:inline="text">[[*{ingredients}]]</textarea>
+
+
+
+				<input type="hidden" name="recipeId" id="recipeId" th:field="*{id}" value="" /> 
+	
+
+				<div>
+				<input class="form-control mt-3" type="text" id="stage" name="stage" th:field="*{stage}" disabled='true' />
+
+				<input class="form-control mt-3 mb-4" type="text" id="failureToParseReason" name="failureToParseReason" th:field="*{failureToParseReason}" disabled='true' />
+				</div>
+
+				<button type="button" id="saveRecipeButton" class="btn btn-primary">Save Recipe</button>
+
+				<button type="button" id="detectIngredientsButton" class="btn btn-link">Detect ingredients from recipe</button>
+
+
+
+			</form>
+		</div>
+	</div>
+
+
+
+	<script>
+		$("#title, #ingredients, #text").focus(function() {
+			$("#saveRecipeButton").attr("disabled", false);
+			$("#saveRecipeButton").html("Save Recipe");
+		})
+
+		var recipeId = $("#recipeId").val();
+
+		if (recipeId == -1) {
+			$("#recipeUrl").blur(checkRecipeIsDuplicate);
+		}
+
+		function checkRecipeIsDuplicate() {
+			var recipeUrl = $("#recipeUrl").val();
+			var url = "/edit/recipe-count-by-url";
+
+			var posting = $.post(url, {
+				url : recipeUrl
+			});
+
+			posting.done(function(data) {
+				if (data > 0) {
+					$("#recipeUrl").css("background", "#fff3cd");
+					$("#recipeAlreadyExistsWarningDiv").show();
+				} else {
+					$("#recipeUrl").css("background", "");
+					$("#recipeAlreadyExistsWarningDiv").hide();
+				}
+			});
+
+			posting.fail(function(data) {
+				console.log(data);
+			});
+
+		}
+
+		$("#saveRecipeButton").click(function(event) {
+
+			var form = $("#recipeForm");
+			form.submit();
+		});
+
+		$("#detectIngredientsButton").click(
+				function(event) {
+
+					var form1 = $("#recipeForm");
+
+					var ingredientsText = form1.find("textarea[id='ingredients']").val();
+					var recipeText = form1.find("textarea[id='text']").val();
+					var url = "/edit/detect-ingredients";
+
+					$("#detectIngredientsButton").html("Computing ingredients, please wait...");
+					$("#detectIngredientsButton").attr("disabled", true);
+
+					// Send the data using post
+					var posting = $.post(url, {
+						ingredientsText : ingredientsText,
+						recipeText : recipeText
+					});
+
+					posting.done(function(data) {
+						$("#ingredients").val(data);
+					});
+
+					posting.fail(function(data) {
+						alert('Sorry, an error has occured.');
+					});
+
+					posting.always(function(data) {
+						$("#detectIngredientsButton").html(
+								"Detect ingredient from recipe");
+						$("#detectIngredientsButton").attr("disabled", false);
+					});
+
+				});
+
+		$("#parseRecipeButton").click(function(event) {
+
+			var recipeUrl = $("#recipeUrl").val();
+
+			$("#parseRecipeButton").html("Parsing...");
+			$("#parseRecipeButton").attr("disabled", true);
+
+			var url = "/edit/parse-recipe";
+
+			// Send the data using post
+			var posting = $.post(url, {
+				recipeUrl : recipeUrl
+			});
+
+			posting.done(function(data) {
+				$("#text").val(data.text);
+				$("#title").val(data.title);
+				$("#ingredients").val(data.ingredientsAsString);
+				$("#stage").val(data.stage);
+				$("#failureToParseReason").val(data.failureToParseReason);
+
+			});
+
+			posting.fail(function(data) {
+				alert('Sorry, an error has occured.');
+			});
+
+			posting.always(function(data) {
+				$("#parseRecipeButton").html("Parse recipe");
+				$("#parseRecipeButton").attr("disabled", false);
+			});
+
+		});
+	</script>
+
+
+</body>
+</html>

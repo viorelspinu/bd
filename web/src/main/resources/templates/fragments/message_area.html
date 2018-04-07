@@ -1,0 +1,9 @@
+<div th:fragment="message_area">
+
+	<div class="alert alert-info" role="alert" th:text="${messages}"
+		th:if="${messageType == 2}"></div>
+
+	<div class="alert alert-warning" role="alert" th:text="${messages}"
+		th:if="${messageType == 1}"></div>
+
+</div>

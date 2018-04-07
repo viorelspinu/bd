@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header">
+</head>
+
+<body>
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+	<div th:replace="fragments/menu :: menu(selected=1)"/>
+	
+	<div th:replace="fragments/message_area :: message_area"/>
+	
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Title</th>
+					<th>Ingredients</th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="recipe : ${recipeList}" th:id="'tr_' + ${recipe.id}">
+					<td th:text="${recipe.id}"></td>
+					<td th:text="${recipe.title}"></td>
+					<td th:text="${recipe.ingredientsAsString}"></td>
+					<td><a target="_blank" th:href="${recipe.recipeUrl}" th:text="${recipe.recipeUrl}"></a></td>					
+					<td><a th:href="@{/edit/edit-recipe(recipeId=${recipe.id})}">Edit</a></td>
+					<td><a class='deleteLink' th:id="'del_' + ${recipe.id}" href="#">Delete</a></td>
+				</tr>
+
+			</tbody>
+		</table>
+
+	<script>
+	$(document).ready(function() {
+		$(".deleteLink").click(function(event) {
+			var buttonId = event.currentTarget.id;		
+			var id = buttonId.substring("del_".length, buttonId.length);
+			var url = "/edit/delete-recipe";
+			
+			var posting = $.post(url, {
+				recipeId : id,
+				stage : 3
+			});
+			
+			$("#tr_"+id).remove();
+			
+			posting.done(function(data) {
+				
+			});
+			return false;
+		});
+	});
+	</script>
+
+</div>
+</body>
+</html>

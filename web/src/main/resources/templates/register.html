@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header">
+</head>
+
+<body>
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+	<div th:replace="fragments/menu :: menu(selected=3)" />
+
+	<div th:replace="fragments/message_area :: message_area" />
+
+	<div class="alert alert-danger" th:if="${param.error}" th:text="#{invalid.user.or.password}"></div>
+	<div class="alert alert-info" th:if="${param.logout}" th:text="#{logout.success}"></div>
+
+<div class="">
+	<div class='clearfix align-center w-50'>
+
+<h4 class='pt-4 mb-0' th:text="#{create.new.account.header}">Create new account</h4>
+		
+		
+		<form class="" id="registerForm" action="/do-register" method="post">
+			<div class='container clearfix'>
+				<input th:name="${_csrf.parameterName}" type="hidden"
+					th:value="${_csrf.token}" /> 
+					
+					<label for="username"
+					class="float-left mt-4 col-form-label" th:text="#{email.address}">Your email address</label> 
+					
+					<input
+					class="form-control" type="text" id="username"
+					placeholder="email address" name="email" th:value="${email}" />
+				
+					<label for="password"
+					class="float-left mt-4 col-form-label" th:text="#{label.password}">Your password</label> 
+				
+				<input class="form-control" type="password" id="password"
+					placeholder="password" name="password" th:value="${password}" />
+					
+				<div class='mt-4'>
+				<span th:text="#{already.account}">Already have an account ?</span> <a href='/login' th:text="#{login}">Login</a> 
+				</div>	 
+
+				<button type="submit" id="saveRecipeButton"
+					class="btn btn-primary mt-4 float-right" th:text="#{create.account}">Create account</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+</div>
+</body>
+</html>

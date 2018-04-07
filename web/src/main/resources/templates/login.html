@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/header :: header">
+</head>
+
+<body>
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+	<div th:replace="fragments/menu :: menu(selected=3)" />
+
+	<div th:replace="fragments/message_area :: message_area" />
+
+	<div class="alert alert-danger" th:if="${param.error}" th:text="#{invalid.auth}">Invalid username and password.</div>
+	<div class="alert alert-info" th:if="${param.logout}" th:text="#{logout.success}">You have been logged out.</div>
+
+<div class="">
+	<div class='clearfix align-center w-50'>
+
+<h4 class='pt-4 mb-0' th:text="#{login.title}">Login</h4>
+		
+		<form class="" id="loginForm" action="/login" method="post">
+			<div class='container clearfix'>
+			
+				<input th:name="${_csrf.parameterName}" type="hidden"
+					th:value="${_csrf.token}" /> 
+					
+				<label for="username"
+					class="float-left mt-4 col-form-label" th:text="#{email.address}">Your email address</label> 
+					
+				<input class="form-control" type="text" id="username"
+					placeholder="email address" name="username" th:value="${email}" />
+				
+				<label for="password"
+					class="float-left mt-4 col-form-label" th:text="#{label.password}">Your password</label> 
+				
+				<input class="form-control" type="password" id="password"
+					placeholder="password" name="password" th:value="${password}" />
+
+				<div class="checkbox mt-3">
+					<input type="checkbox"
+							name="remember-me" checked="checked" th:text="#{label.remember.me}"/>
+					
+				</div>
+
+				<button type="submit" id="saveRecipeButton"
+					class="btn btn-primary mt-4 float-right" th:text="#{label.login}">Login</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+</div>
+</body>
+</html>

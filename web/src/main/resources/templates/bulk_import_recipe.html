@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<head th:replace="fragments/header :: header">
+</head>
+
+
+<body>
+
+
+	<div class='container clearfix pb-5' style='background:#FFF'>
+
+
+
+		<div th:replace="fragments/menu :: menu(selected=5)" />
+		<div th:replace="fragments/message_area :: message_area" />
+
+
+
+		<div class="container">
+
+
+			<form id="importForm" action="/edit/save-url-list" method="post">
+
+				<input th:name="${_csrf.parameterName}" type="hidden"
+						th:value="${_csrf.token}" />
+				<textarea placeholder="Enter recipe links (each one on a new line)"
+					class="form-control mb-4" name="urlList" rows="16" cols="80"
+					id='urlList' th:inline="text">[[${urlList}]]</textarea>
+				
+				<button type="button" id="saveButton" class="btn btn-primary">Save
+					for parsing</button>
+
+				<a class="btn btn-link" href='/view-recipe-list'>Recipe List</a>&nbsp;&nbsp;
+
+			</form>
+		</div>
+	</div>
+
+
+
+	<script>
+		$("#saveButton").click(function(event) {
+			var form = $("#importForm");
+			form.submit();
+		});
+	</script>
+
+
+</body>
+</html>
